@@ -56,6 +56,16 @@
 //	#define HANDLE pthread_cond_t*
 #endif
 
+#ifdef WINDOWS
+	#define SOCKETWOULDBLOCK WSAEWOULDBLOCK
+#else
+	#define SOCKETWOULDBLOCK EWOULDBLOCK
+#endif
+
+#ifndef SD_BOTH
+	#define SD_BOTH 2
+#endif
+
 //	Wrapping of OS-dependent functions
 namespace	core{
 

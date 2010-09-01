@@ -978,7 +978,7 @@ namespace	core{
 			else if (err == WSAEMFILE) {
 				strcpy(buffer, "The queue is nonempty upon entry to accept and there are no descriptors available");
 			}
-			else if (err == WSAEWOULDBLOCK) {
+			else if (err == SOCKETWOULDBLOCK) {
 				strcpy(buffer, "The socket is marked as nonblocking and no connections are present to be accepted");
 			}
 			else if (err == WSAETIMEDOUT) {
