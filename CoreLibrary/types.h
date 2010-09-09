@@ -136,24 +136,32 @@ namespace	core{
 
 #define	WORD32_MASK					0xFFFFFFFF
 
+typedef	long						word32;
+typedef	short						word16;
+
+typedef	char						int8;
+typedef	unsigned	char			uint8;
+typedef	short						int16;
+typedef	unsigned	short			uint16;
+typedef	float						float32;
+typedef	double						float64;
+
+typedef	word32						word;
+typedef	word16						half_word;
+
+#if defined	WINDOWS
+	typedef	long					int32;
+	typedef	unsigned	long		uint32;
+	typedef	__int64					int64;
+	typedef	unsigned __int64		uint64;
+#else
+	typedef	int						int32;
+	typedef	unsigned	int			uint32;
+	typedef	int64_t					int64;
+	typedef	uint64_t				uint64;
+#endif
+
 #if defined	ARCH_32
-
-	typedef	long						word32;
-	typedef	short						word16;
-
-	typedef	char						int8;
-	typedef	unsigned	char			uint8;
-	typedef	short						int16;
-	typedef	unsigned	short			uint16;
-	typedef	long						int32;
-	typedef	unsigned	long			uint32;
-	typedef	long		long			int64;
-	typedef	unsigned	long	long	uint64;
-	typedef	float						float32;
-	typedef	double						float64;
-
-	typedef	word32						word;
-	typedef	word16						half_word;
 
 	#define	HALF_WORD_SHIFT				16
 	#define	HALF_WORD_HIGH_MASK			0xFFFF0000
@@ -161,23 +169,8 @@ namespace	core{
 	#define	WORD_MASK					0xFFFFFFFF
 
 #elif defined	ARCH_64
-
-	typedef	int							word32;
-	typedef	long						word64;
-
-	typedef	char						int8;
-	typedef	unsigned	char			uint8;
-	typedef	short						int16;
-	typedef	unsigned	short			uint16;
-	typedef	int							int32;
-	typedef	unsigned	int				uint32;
-	typedef	long						int64;
-	typedef	unsigned	long			uint64;
-	typedef	float						float32;
-	typedef	double						float64;
-
-	typedef	word64						word;
-	typedef	word32						half_word;
+	// UPS!
+	// typedef	unsigned	long			uint64;
 
 	#define	HALF_WORD_SHIFT				32
 	#define	HALF_WORD_HIGH_MASK			0xFFFFFFFF00000000

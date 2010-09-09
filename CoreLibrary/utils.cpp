@@ -391,7 +391,7 @@ namespace	core{
 
 	uint8	Host::Name(char	*name){
 #if defined	WINDOWS
-		uint32	s=255;
+		DWORD	s=255;
 		GetComputerName(name,&s);
 		return	(uint8)s;
 #elif defined LINUX
@@ -668,7 +668,7 @@ namespace	core{
 
 		TimeProbe	probe;
 		probe.set();
-		bool	r=wait(timeout);
+		bool	r=wait((uint64)timeout);
 		probe.check();
 		us=probe.us();
 		return	r;
@@ -761,7 +761,7 @@ namespace	core{
 
 	int32	Atomic::Increment32(int32	volatile	*v){
 #if defined	WINDOWS
-		return	InterlockedIncrement(v);
+		return	InterlockedIncrement((long*)v);
 #elif defined LINUX
 		__sync_add_and_fetch(v, 1);
 		return	*v;
@@ -770,7 +770,7 @@ namespace	core{
 
 	int32	Atomic::Decrement32(int32	volatile	*v){
 #if defined	WINDOWS
-		return	InterlockedDecrement(v);
+		return	InterlockedDecrement((long*)v);
 #elif defined LINUX
 		__sync_add_and_fetch(v, -1);
 		return	*v;
@@ -779,7 +779,7 @@ namespace	core{
 
 	int32	Atomic::CompareAndSwap32(int32	volatile	*target,int32	v1,int32	v2){
 #if defined	WINDOWS
-		return	_InterlockedCompareExchange(target,v2,v1);
+		return	_InterlockedCompareExchange((long*)target,v2,v1);
 #elif defined LINUX
 		// note that v1 and v2 are swapped for Linux!!!
 		return __sync_val_compare_and_swap(target, v1, v2);
@@ -795,17 +795,17 @@ namespace	core{
 #endif
 	}
 
-	word	Atomic::CompareAndSwap(word	volatile	*target,word	v1,word	v2){
-#if defined	ARCH_32
-		return	CompareAndSwap32(target,v1,v2);
-#elif defined ARCH_64
-		return	CompareAndSwap64(target,v1,v2);
-#endif
-	}
+//	word	Atomic::CompareAndSwap(word	volatile	*target,word	v1,word	v2){
+//#if defined	ARCH_32
+//		return	CompareAndSwap32(target,v1,v2);
+//#elif defined ARCH_64
+//		return	CompareAndSwap32((uint32*)target,v1,v2);
+//#endif
+//	}
 
 	int32	Atomic::Swap32(int32	volatile	*target,int32	v){
 #if defined	WINDOWS
-		return	_InterlockedExchange(target,v);
+		return	_InterlockedExchange((long*)target,v);
 #elif defined LINUX
 		return __sync_fetch_and_sub(target,v);
 #endif
@@ -819,20 +819,20 @@ namespace	core{
 #endif
 	}
 
-	word	Atomic::Swap(word	volatile	*target,word	v){
-#if defined	ARCH_32
-		return	Swap32(target,v);
-#elif defined ARCH_64
-		return	Swap64(target,v);
-#endif
-	}
+//	word	Atomic::Swap(word	volatile	*target,word	v){
+//#if defined	ARCH_32
+//		return	Swap32(target,v);
+//#elif defined ARCH_64
+//		return	Swap32((uint32*)target,v);
+//#endif
+//	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	uint8	BSR(word	data){
 #if defined	WINDOWS
 #if defined	ARCH_32
-		uint32	index;
+		DWORD	index;
 		_BitScanReverse(&index,data);
 		return	(uint8)index;
 #elif defined	ARCH_64
