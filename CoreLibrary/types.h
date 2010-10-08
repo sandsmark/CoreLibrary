@@ -31,10 +31,12 @@
 #ifndef core_types_h
 #define core_types_h
 
+#ifndef	DEBUG_VISUALIZER
 #undef	_SECURE_SCL
 #define _SECURE_SCL 1
 #undef	_HAS_ITERATOR_DEBUGGING
 #define _HAS_ITERATOR_DEBUGGING 0
+#endif
 
 #include	<cstddef>
 
