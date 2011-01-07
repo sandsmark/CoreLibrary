@@ -46,6 +46,11 @@
 #include	<ctime>
 
 
+#define	R250_IA	(sizeof(uint32)*103)
+#define	R250_IB	(sizeof(uint32)*R250_LEN-R250_IA)
+#define	R521_IA	(sizeof(uint32)*168)
+#define	R521_IB	(sizeof(uint32)*R521_LEN-R521_IA)
+
 namespace	core{
 
 	#if defined LINUX
@@ -1167,5 +1172,85 @@ namespace	core{
 		char buffer[1024];
 		sprintf(buffer,"%u",i);
 		return std::string(buffer);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	int32	Random::r250_index;
+	int32	Random::r521_index;
+	uint32	Random::r250_buffer[R250_LEN];
+	uint32	Random::r521_buffer[R521_LEN];
+
+	void	Random::Init(){
+
+		int32	i=R521_LEN;
+		uint32	mask1=1;
+		uint32	mask2=0xFFFFFFFF;
+		
+		while(i-->R250_LEN)
+			r521_buffer[i]=rand();
+		while(i-->31){
+
+			r250_buffer[i]=rand();
+			r521_buffer[i]=rand();
+		}
+
+		//	Establish linear independence of the bit columns
+		//	by setting the diagonal bits and clearing all bits above
+		while(i-->0){
+
+			r250_buffer[i]=(rand()	|	mask1)	&	mask2;
+			r521_buffer[i]=(rand()	|	mask1)	&	mask2;
+			mask2^=mask1;
+			mask1>>=1;
+		}
+		r250_buffer[0]=mask1;
+		r521_buffer[0]=mask2;
+		r250_index=0;
+		r521_index=0;
+	}
+
+	float32	Random::operator	()(uint32	range){
+		/*
+		I prescale the indices by sizeof(unsigned long) to eliminate
+		four shlwi instructions in the compiled code.  This minor optimization
+		increased perf by about 12%.
+	    
+		I also carefully arrange index increments and comparisons to minimize
+		instructions.  gcc 3.3 seems a bit weak on instruction reordering. The
+		j1/j2 branches are mispredicted, but nevertheless these optimizations
+		increased perf by another 10%.
+		*/
+	    
+		int32	i1=r250_index;
+		int32	i2=r521_index;
+		uint8	*b1=(uint8	*)r250_buffer;
+		uint8	*b2=(uint8	*)r521_buffer;
+		uint32	*tmp1,*tmp2;
+		uint32	r,s;
+		int32	j1,j2;
+	    
+		j1=i1-R250_IB;
+		if(j1<0)
+			j1=i1+R250_IA;
+		j2=i2-R521_IB;
+		if(j2<0)
+			j2=i2+R521_IA;
+	    
+		tmp1=(uint32	*)(b1+i1);
+		r=(*(uint32	*)(b1+j1))^(*tmp1);
+		*tmp1=r;
+		tmp2=(uint32	*)(b2+i2);
+		s=(*(uint32	*)(b2+j2))^(*tmp2);
+		*tmp2=s;
+	    
+		i1=(i1!= sizeof(uint32)*(R250_LEN-1))?(i1 + sizeof(uint32)):0;
+		r250_index=i1;
+		i2=(i2!=sizeof(uint32)*(R521_LEN-1))?(i2 + sizeof(uint32)):0;
+		r521_index=i2;
+
+		float32	_r=r^s;
+		//return	range*(_r/((float32)ULONG_MAX));
+		return	_r;
 	}
 }

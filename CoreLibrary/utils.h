@@ -66,6 +66,9 @@
 	#define SD_BOTH 2
 #endif
 
+#define	R250_LEN	250
+#define	R521_LEN	521
+
 //	Wrapping of OS-dependent functions
 namespace	core{
 
@@ -267,6 +270,18 @@ namespace	core{
 		static	void		ReplaceLeading(std::string& str, const char* chars2replace, char c);
 		static	std::string	Int2String(int64 i);
 		static	std::string	Uint2String(uint64 i);
+	};
+
+	class	core_dll	Random{
+	private:
+		static	int32	r250_index;
+		static	int32	r521_index;
+		static	uint32	r250_buffer[R250_LEN];
+		static	uint32	r521_buffer[R521_LEN];
+	public:
+		static	void	Init();
+
+		float32	operator	()(uint32	range);	//	returns a value in [0,range].
 	};
 }
 
