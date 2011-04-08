@@ -62,7 +62,9 @@
 	#define	WIN32_LEAN_AND_MEAN
 	#define	_WIN32_WINNT	0x0501	//	i.e. win xp sp2
 	#include	<windows.h>
+#ifndef AF_MAX
 	#include	<winsock2.h>
+#endif
 
 	#include	<vector>
 	#include	<unordered_set>
